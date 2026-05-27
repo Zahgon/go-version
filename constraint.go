@@ -4,10 +4,7 @@
 package version
 
 import (
-	"fmt"
 	"regexp"
-	"sort"
-	"strings"
 	"sync"
 )
 
@@ -16,17 +13,9 @@ var (
 	constraintRegexpOnce sync.Once
 )
 
-func getConstraintRegexp() *regexp.Regexp {
-	constraintRegexpOnce.Do(func() {
-		// This heavy lifting only happens the first time this function is called
-		constraintRegexp = regexp.MustCompile(fmt.Sprintf(
-			`^\s*(%s)\s*(%s)\s*$`,
-			`<=|>=|!=|~>|<|>|=|`,
-			VersionRegexpRaw,
-		))
-	})
-	return constraintRegexp
-}
+func getConstraintRegexp() *regexp.Regexp { _ = "STUB: not implemented"; return nil }
+
+// This heavy lifting only happens the first time this function is called
 
 // Constraint represents a single constraint for a version, such as
 // ">= 1.0".
@@ -37,9 +26,7 @@ type Constraint struct {
 	original string
 }
 
-func (c *Constraint) Equals(con *Constraint) bool {
-	return c.op == con.op && c.check.Equal(con.check)
-}
+func (c *Constraint) Equals(con *Constraint) bool { _ = "STUB: not implemented"; return false }
 
 // Constraints is a slice of constraints. We make a custom type so that
 // we can add methods to it.
@@ -56,40 +43,19 @@ type constraintOperation struct {
 // constraint string. The string must be a comma-separated list of
 // constraints.
 func NewConstraint(v string) (Constraints, error) {
-	vs := strings.Split(v, ",")
-	result := make([]*Constraint, len(vs))
-	for i, single := range vs {
-		c, err := parseSingle(single)
-		if err != nil {
-			return nil, err
-		}
-
-		result[i] = c
-	}
-
-	return Constraints(result), nil
+	_ = "STUB: not implemented"
+	return *new(Constraints), nil
 }
 
 // MustConstraints is a helper that wraps a call to a function
 // returning (Constraints, error) and panics if error is non-nil.
 func MustConstraints(c Constraints, err error) Constraints {
-	if err != nil {
-		panic(err)
-	}
-
-	return c
+	_ = "STUB: not implemented"
+	return *new(Constraints)
 }
 
 // Check tests if a version satisfies all the constraints.
-func (cs Constraints) Check(v *Version) bool {
-	for _, c := range cs {
-		if !c.Check(v) {
-			return false
-		}
-	}
-
-	return true
-}
+func (cs Constraints) Check(v *Version) bool { _ = "STUB: not implemented"; return false }
 
 // Equals compares Constraints with other Constraints
 // for equality. This may not represent logical equivalence
@@ -99,131 +65,43 @@ func (cs Constraints) Check(v *Version) bool {
 //
 // Missing operator is treated as equal to '=', whitespaces
 // are ignored and constraints are sorted before comparison.
-func (cs Constraints) Equals(c Constraints) bool {
-	if len(cs) != len(c) {
-		return false
-	}
+func (cs Constraints) Equals(c Constraints) bool { _ = "STUB: not implemented"; return false }
 
-	// make copies to retain order of the original slices
-	left := make(Constraints, len(cs))
-	copy(left, cs)
-	sort.Stable(left)
-	right := make(Constraints, len(c))
-	copy(right, c)
-	sort.Stable(right)
+// make copies to retain order of the original slices
 
-	// compare sorted slices
-	for i, con := range left {
-		if !con.Equals(right[i]) {
-			return false
-		}
-	}
+// compare sorted slices
 
-	return true
-}
+func (cs Constraints) Len() int { _ = "STUB: not implemented"; return 0 }
 
-func (cs Constraints) Len() int {
-	return len(cs)
-}
+func (cs Constraints) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
-func (cs Constraints) Less(i, j int) bool {
-	if cs[i].op < cs[j].op {
-		return true
-	}
-	if cs[i].op > cs[j].op {
-		return false
-	}
-
-	return cs[i].check.LessThan(cs[j].check)
-}
-
-func (cs Constraints) Swap(i, j int) {
-	cs[i], cs[j] = cs[j], cs[i]
-}
+func (cs Constraints) Swap(i, j int) { _ = "STUB: not implemented"; return }
 
 // Returns the string format of the constraints
-func (cs Constraints) String() string {
-	csStr := make([]string, len(cs))
-	for i, c := range cs {
-		csStr[i] = c.String()
-	}
-
-	return strings.Join(csStr, ",")
-}
+func (cs Constraints) String() string { _ = "STUB: not implemented"; return "" }
 
 // Check tests if a constraint is validated by the given version.
-func (c *Constraint) Check(v *Version) bool {
-	return c.f(v, c.check)
-}
+func (c *Constraint) Check(v *Version) bool { _ = "STUB: not implemented"; return false }
 
 // Prerelease returns true if the version underlying this constraint
 // contains a prerelease field.
-func (c *Constraint) Prerelease() bool {
-	return len(c.check.Prerelease()) > 0
-}
+func (c *Constraint) Prerelease() bool { _ = "STUB: not implemented"; return false }
 
-func (c *Constraint) String() string {
-	return c.original
-}
+func (c *Constraint) String() string { _ = "STUB: not implemented"; return "" }
 
-func parseSingle(v string) (*Constraint, error) {
-	matches := getConstraintRegexp().FindStringSubmatch(v)
-	if matches == nil {
-		return nil, fmt.Errorf("malformed constraint: %s", v)
-	}
+func parseSingle(v string) (*Constraint, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	check, err := NewVersion(matches[2])
-	if err != nil {
-		return nil, err
-	}
+func prereleaseCheck(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
-	var cop constraintOperation
-	switch matches[1] {
-	case "=":
-		cop = constraintOperation{op: equal, f: constraintEqual}
-	case "!=":
-		cop = constraintOperation{op: notEqual, f: constraintNotEqual}
-	case ">":
-		cop = constraintOperation{op: greaterThan, f: constraintGreaterThan}
-	case "<":
-		cop = constraintOperation{op: lessThan, f: constraintLessThan}
-	case ">=":
-		cop = constraintOperation{op: greaterThanEqual, f: constraintGreaterThanEqual}
-	case "<=":
-		cop = constraintOperation{op: lessThanEqual, f: constraintLessThanEqual}
-	case "~>":
-		cop = constraintOperation{op: pessimistic, f: constraintPessimistic}
-	default:
-		cop = constraintOperation{op: equal, f: constraintEqual}
-	}
+// A constraint with a pre-release can only match a pre-release version
+// with the same base segments.
 
-	return &Constraint{
-		f:        cop.f,
-		op:       cop.op,
-		check:    check,
-		original: v,
-	}, nil
-}
+// A constraint without a pre-release can only match a version without a
+// pre-release.
 
-func prereleaseCheck(v, c *Version) bool {
-	switch vPre, cPre := v.Prerelease() != "", c.Prerelease() != ""; {
-	case cPre && vPre:
-		// A constraint with a pre-release can only match a pre-release version
-		// with the same base segments.
-		return v.equalSegments(c)
+// OK, except with the pessimistic operator
 
-	case !cPre && vPre:
-		// A constraint without a pre-release can only match a version without a
-		// pre-release.
-		return false
-
-	case cPre && !vPre:
-		// OK, except with the pessimistic operator
-	case !cPre && !vPre:
-		// OK
-	}
-	return true
-}
+// OK
 
 //-------------------------------------------------------------------
 // Constraint functions
@@ -241,67 +119,39 @@ const (
 	pessimistic      operator = '~'
 )
 
-func constraintEqual(v, c *Version) bool {
-	return v.Equal(c)
-}
+func constraintEqual(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
-func constraintNotEqual(v, c *Version) bool {
-	return !v.Equal(c)
-}
+func constraintNotEqual(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
-func constraintGreaterThan(v, c *Version) bool {
-	return prereleaseCheck(v, c) && v.Compare(c) == 1
-}
+func constraintGreaterThan(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
-func constraintLessThan(v, c *Version) bool {
-	return prereleaseCheck(v, c) && v.Compare(c) == -1
-}
+func constraintLessThan(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
-func constraintGreaterThanEqual(v, c *Version) bool {
-	return prereleaseCheck(v, c) && v.Compare(c) >= 0
-}
+func constraintGreaterThanEqual(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
-func constraintLessThanEqual(v, c *Version) bool {
-	return prereleaseCheck(v, c) && v.Compare(c) <= 0
-}
+func constraintLessThanEqual(v, c *Version) bool { _ = "STUB: not implemented"; return false }
 
 func constraintPessimistic(v, c *Version) bool {
+	_ = "STUB: not implemented"
 	// Using a pessimistic constraint with a pre-release, restricts versions to pre-releases
-	if !prereleaseCheck(v, c) || (c.Prerelease() != "" && v.Prerelease() == "") {
-		return false
-	}
-
-	// If the version being checked is naturally less than the constraint, then there
-	// is no way for the version to be valid against the constraint
-	if v.LessThan(c) {
-		return false
-	}
-	// We'll use this more than once, so grab the length now so it's a little cleaner
-	// to write the later checks
-	cs := len(c.segments)
-
-	// If the version being checked has less specificity than the constraint, then there
-	// is no way for the version to be valid against the constraint
-	if cs > len(v.segments) {
-		return false
-	}
-
-	// Check the segments in the constraint against those in the version. If the version
-	// being checked, at any point, does not have the same values in each index of the
-	// constraints segments, then it cannot be valid against the constraint.
-	for i := 0; i < c.si-1; i++ {
-		if v.segments[i] != c.segments[i] {
-			return false
-		}
-	}
-
-	// Check the last part of the segment in the constraint. If the version segment at
-	// this index is less than the constraints segment at this index, then it cannot
-	// be valid against the constraint
-	if c.segments[cs-1] > v.segments[cs-1] {
-		return false
-	}
-
-	// If nothing has rejected the version by now, it's valid
-	return true
+	return false
 }
+
+// If the version being checked is naturally less than the constraint, then there
+// is no way for the version to be valid against the constraint
+
+// We'll use this more than once, so grab the length now so it's a little cleaner
+// to write the later checks
+
+// If the version being checked has less specificity than the constraint, then there
+// is no way for the version to be valid against the constraint
+
+// Check the segments in the constraint against those in the version. If the version
+// being checked, at any point, does not have the same values in each index of the
+// constraints segments, then it cannot be valid against the constraint.
+
+// Check the last part of the segment in the constraint. If the version segment at
+// this index is less than the constraints segment at this index, then it cannot
+// be valid against the constraint
+
+// If nothing has rejected the version by now, it's valid
